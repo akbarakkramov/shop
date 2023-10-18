@@ -3,7 +3,7 @@ package com.example.shop
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.shop.databinding.ActivityMainBinding
-import com.example.shop.model.MainFragment
+import com.example.shop.ui.MainFragment
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding

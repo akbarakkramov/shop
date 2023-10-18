@@ -1,4 +1,4 @@
-package com.example.shop.model
+package com.example.shop.ui
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.shop.R
 import com.example.shop.databinding.FragmentMainBinding
+import com.example.shop.ui.HomeFragment
 
 class MainFragment : Fragment() {
     override fun onCreateView(
