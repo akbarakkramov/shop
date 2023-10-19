@@ -19,18 +19,18 @@
                 android:id="@+id/yurakcha"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@drawable/heart"
+                android:src="@drawable/baseline_favorite_border_24"
                 android:layout_gravity="end"
                 android:layout_margin="15dp"/>
             <ImageView
-                android:id="@+id/carimage"
+                android:id="@+id/phone_img"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/phone"
                 android:scaleType="centerInside"/>
         </androidx.cardview.widget.CardView>
         <TextView
-            android:id="@+id/carname"
+            android:id="@+id/phone_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/carcard"
@@ -46,8 +46,8 @@
             android:id="@+id/star"
             android:layout_width="17dp"
             android:layout_height="17dp"
-            app:layout_constraintStart_toStartOf="@id/carname"
-            app:layout_constraintTop_toBottomOf="@id/carname"
+            app:layout_constraintStart_toStartOf="@id/phone_name"
+            app:layout_constraintTop_toBottomOf="@id/phone_name"
             android:src="@drawable/star"
             android:layout_marginStart="5dp"/>
         <TextView
@@ -67,19 +67,19 @@
             android:text="|"
             android:textColor="@color/black"
             app:layout_constraintStart_toEndOf="@id/reyting"
-            app:layout_constraintTop_toBottomOf="@id/carname"
+            app:layout_constraintTop_toBottomOf="@id/phone_name"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="5dp"
             android:textSize="20sp"/>
         <androidx.cardview.widget.CardView
             android:layout_width="50dp"
             android:layout_height="25dp"
-            app:layout_constraintTop_toBottomOf="@id/carname"
+            app:layout_constraintTop_toBottomOf="@id/phone_name"
             app:layout_constraintStart_toEndOf="@id/tayoq"
             android:backgroundTint="#E4E2E2"
             app:cardCornerRadius="5dp"
             android:layout_marginStart="10dp"
-            app:layout_constraintBottom_toTopOf="@id/narxi">
+            app:layout_constraintBottom_toTopOf="@id/phone_price">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -88,11 +88,11 @@
                 android:textColor="@color/black"/>
         </androidx.cardview.widget.CardView>
         <TextView
-            android:id="@+id/narxi"
+            android:id="@+id/phone_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/star"
-            app:layout_constraintStart_toStartOf="@id/carname"
+            app:layout_constraintStart_toStartOf="@id/phone_name"
             android:text="155 000$"
             android:textStyle="bold"
             android:textSize="20sp"

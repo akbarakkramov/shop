@@ -1,11 +1,24 @@
 package com.example.shop.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView.OnQueryTextListener
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.shop.R
+import com.example.shop.adapters.PhonesAdapter
+import com.example.shop.databinding.FragmentHomeBinding
+import com.example.shop.model.Product
+import com.example.shop.model.ProductData
+import com.example.shop.networking.APIClient
+import com.example.shop.networking.APIService
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -21,6 +34,8 @@ class HomeFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    lateinit var phoneList: List<Product>
+    lateinit var searchList: List<Product>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,8 +49,71 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false)
+        val binding = FragmentHomeBinding.inflate(inflater, container, false)
+        val api = APIClient.getInstance().create(APIService::class.java)
+        phoneList = listOf()
+        searchList = listOf()
+
+
+        api.getAllProducts().enqueue(object : Callback<ProductData> {
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onResponse(call: Call<ProductData>, response: Response<ProductData>) {
+                if (response.isSuccessful && response.body() != null) {
+                    phoneList = response.body()!!.products
+                    Log.d("TAG1", phoneList[29].price.toString())
+                }
+            }
+
+            override fun onFailure(call: Call<ProductData>, t: Throwable) {
+                Log.d("TAG", "onFailure: $t")
+            }
+        })
+
+        var adapter = PhonesAdapter(phoneList)
+        var manager = GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
+        binding.phoneRv.adapter = adapter
+        binding.phoneRv.layoutManager = manager
+
+        binding.search.setOnQueryTextListener(object : OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText != null) {
+                    api.searchByName(newText).enqueue(object : Callback<ProductData> {
+                        override fun onResponse(
+                            call: Call<ProductData>,
+                            response: Response<ProductData>
+                        ) {
+                            if (response.isSuccessful && response.body() != null) {
+                                searchList = response.body()!!.products
+                                binding.topdealsText.visibility = View.INVISIBLE
+                                var adapter1 = PhonesAdapter(searchList)
+                                var manager = GridLayoutManager(
+                                    requireContext(),
+                                    2,
+                                    GridLayoutManager.VERTICAL,
+                                    false
+                                )
+                                binding.phoneRv.adapter = adapter1
+                                binding.phoneRv.layoutManager = manager
+                            }
+                        }
+
+                        override fun onFailure(call: Call<ProductData>, t: Throwable) {
+                            Log.d("TAG", "onFailure: $t")
+                        }
+
+                    })
+                    return true
+                }
+                return false
+            }
+
+        })
+
+        return binding.root
     }
 
     companion object {
