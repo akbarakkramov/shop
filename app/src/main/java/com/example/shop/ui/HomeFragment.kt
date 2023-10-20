@@ -53,13 +53,17 @@ class HomeFragment : Fragment() {
         val api = APIClient.getInstance().create(APIService::class.java)
         phoneList = listOf()
         searchList = listOf()
-
+        var adapter = PhonesAdapter(phoneList)
+        var manager = GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
+        binding.phoneRv.adapter = adapter
+        binding.phoneRv.layoutManager = manager
 
         api.getAllProducts().enqueue(object : Callback<ProductData> {
             @SuppressLint("NotifyDataSetChanged")
             override fun onResponse(call: Call<ProductData>, response: Response<ProductData>) {
                 if (response.isSuccessful && response.body() != null) {
                     phoneList = response.body()!!.products
+                    binding.phoneRv.adapter = PhonesAdapter(phoneList)
                     Log.d("TAG1", phoneList[29].price.toString())
                 }
             }
@@ -69,10 +73,7 @@ class HomeFragment : Fragment() {
             }
         })
 
-        var adapter = PhonesAdapter(phoneList)
-        var manager = GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
-        binding.phoneRv.adapter = adapter
-        binding.phoneRv.layoutManager = manager
+
 
         binding.search.setOnQueryTextListener(object : OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
