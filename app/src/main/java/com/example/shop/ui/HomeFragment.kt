@@ -1,6 +1,7 @@
 package com.example.shop.ui
 
 import android.annotation.SuppressLint
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -9,7 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.shop.R
+import com.example.shop.adapters.CategoryAdapter
 import com.example.shop.adapters.PhonesAdapter
 import com.example.shop.databinding.FragmentHomeBinding
 import com.example.shop.model.Product
@@ -20,22 +23,18 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-// TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [HomeFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+
 class HomeFragment : Fragment() {
-    // TODO: Rename and change types of parameters
+
     private var param1: String? = null
     private var param2: String? = null
     lateinit var phoneList: List<Product>
-    lateinit var searchList: List<Product>
+    lateinit var searchList:List<Product>
+    lateinit var binding: FragmentHomeBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +48,7 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding = FragmentHomeBinding.inflate(inflater, container, false)
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
         val api = APIClient.getInstance().create(APIService::class.java)
         phoneList = listOf()
         searchList = listOf()
@@ -57,6 +56,9 @@ class HomeFragment : Fragment() {
         var manager = GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
         binding.phoneRv.adapter = adapter
         binding.phoneRv.layoutManager = manager
+
+        binding.dealsRecyclerview.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
         api.getAllProducts().enqueue(object : Callback<ProductData> {
             @SuppressLint("NotifyDataSetChanged")
@@ -74,59 +76,92 @@ class HomeFragment : Fragment() {
         })
 
 
+        api.getCategories().enqueue(object : Callback<List<String>> {
+            override fun onResponse(call: Call<List<String>>, response: Response<List<String>>) {
+                val categories = response.body()!!
+                binding.dealsRecyclerview.adapter = CategoryAdapter(
+                    categories,
+                    requireContext(),
+                    object : CategoryAdapter.CategoryPressed {
+                        override fun onPressed(category: String) {
+                            if (category == "") {
+                                api.getAllProducts().enqueue(object : Callback<ProductData>{
+                                    override fun onResponse(
+                                        call: Call<ProductData>,
+                                        response: Response<ProductData>
+                                    ) {
+                                        phoneList = response.body()!!.products
+                                        binding.phoneRv.adapter = PhonesAdapter(phoneList)
 
-        binding.search.setOnQueryTextListener(object : OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return true
-            }
+                                    }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                if (newText != null) {
-                    api.searchByName(newText).enqueue(object : Callback<ProductData> {
-                        override fun onResponse(
-                            call: Call<ProductData>,
-                            response: Response<ProductData>
-                        ) {
-                            if (response.isSuccessful && response.body() != null) {
-                                searchList = response.body()!!.products
-                                binding.topdealsText.visibility = View.INVISIBLE
-                                var adapter1 = PhonesAdapter(searchList)
-                                var manager = GridLayoutManager(
-                                    requireContext(),
-                                    2,
-                                    GridLayoutManager.VERTICAL,
-                                    false
-                                )
-                                binding.phoneRv.adapter = adapter1
-                                binding.phoneRv.layoutManager = manager
+                                    override fun onFailure(call: Call<ProductData>, t: Throwable) {
+                                        Log.d("TAG", "$t")
+                                    }
+
+                                })
+                            } else {
+                                api.getByCategory(category).enqueue(object : Callback<ProductData> {
+                                    override fun onResponse(
+                                        call: Call<ProductData>,
+                                        response: Response<ProductData>
+                                    ) {
+                                        phoneList = response.body()!!.products
+                                        binding.phoneRv.adapter = PhonesAdapter(phoneList)
+                                    }
+
+                                    override fun onFailure(call: Call<ProductData>, t: Throwable) {
+                                        Log.d("TAG", "$t")
+                                    }
+                                })
                             }
                         }
 
-                        override fun onFailure(call: Call<ProductData>, t: Throwable) {
-                            Log.d("TAG", "onFailure: $t")
-                        }
-
                     })
-                    return true
-                }
-                return false
+            }
+
+            override fun onFailure(call: Call<List<String>>, t: Throwable) {
+
             }
 
         })
+        binding.search.setOnQueryTextListener(object :OnQueryTextListener {
+override fun onQueryTextSubmit(query: String?):Boolean{
+    return true
+}
+           override fun onQueryTextChange(newText:String?): Boolean {
+             if (newText != null) {
+                   api.searchByName(newText).enqueue(object : Callback<ProductData> {
+                       override fun onResponse(
+                           call: Call<ProductData>,
+                           response: Response<ProductData>) {
+                          if (response.isSuccessful && response.body() != null) {
+                              searchList= response.body()!!.products
+                              binding.topdealsText.visibility = View.INVISIBLE
+
+                              var adapter1 = PhonesAdapter(searchList)
+                              var manager = GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
+                              binding.phoneRv.adapter = adapter1
+                              binding.phoneRv.layoutManager = manager
+                          }
+                         }
+                         override fun onFailure(call: Call<ProductData>, t: Throwable) {
+                            Log.d("TAG", "OnFailure: $t")
+                         }
+                      })
+                     return true
+                 }
+                 return false
+             }
+         })
 
         return binding.root
     }
 
+
+
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment HomeFragment.
-         */
-        // TODO: Rename and change types and number of parameters
+
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             HomeFragment().apply {
