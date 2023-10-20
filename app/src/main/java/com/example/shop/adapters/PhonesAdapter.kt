@@ -34,5 +34,14 @@ class PhonesAdapter(var phoneList:List<Product>) : RecyclerView.Adapter<PhonesAd
         holder.reyting.text = phone.rating.toString()
         holder.price.text = phone.price.toString()
         holder.img.load(phone.thumbnail)
+//        holder.itemView.setOnClickListener {
+//            productPressed.onPressed(phone)
+//        }
     }
+
+
+//    interface ProductPressed{
+//        fun onPressed(product: Product)
+//    }
+
 }

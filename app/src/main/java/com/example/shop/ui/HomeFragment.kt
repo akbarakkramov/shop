@@ -9,7 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.shop.R
+import com.example.shop.adapters.CategoryAdapter
 import com.example.shop.adapters.PhonesAdapter
 import com.example.shop.databinding.FragmentHomeBinding
 import com.example.shop.model.Product
@@ -36,6 +38,7 @@ class HomeFragment : Fragment() {
     private var param2: String? = null
     lateinit var phoneList: List<Product>
     lateinit var searchList: List<Product>
+    lateinit var binding: FragmentHomeBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +52,7 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding = FragmentHomeBinding.inflate(inflater, container, false)
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
         val api = APIClient.getInstance().create(APIService::class.java)
         phoneList = listOf()
         searchList = listOf()
@@ -57,6 +60,9 @@ class HomeFragment : Fragment() {
         var manager = GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
         binding.phoneRv.adapter = adapter
         binding.phoneRv.layoutManager = manager
+
+        binding.dealsRecyclerview.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
         api.getAllProducts().enqueue(object : Callback<ProductData> {
             @SuppressLint("NotifyDataSetChanged")
@@ -74,6 +80,55 @@ class HomeFragment : Fragment() {
         })
 
 
+        api.getCategories().enqueue(object : Callback<List<String>> {
+            override fun onResponse(call: Call<List<String>>, response: Response<List<String>>) {
+                val categories = response.body()!!
+                binding.dealsRecyclerview.adapter = CategoryAdapter(
+                    categories,
+                    requireContext(),
+                    object : CategoryAdapter.CategoryPressed {
+                        override fun onPressed(category: String) {
+                            if (category == "") {
+                                api.getAllProducts().enqueue(object : Callback<ProductData>{
+                                    override fun onResponse(
+                                        call: Call<ProductData>,
+                                        response: Response<ProductData>
+                                    ) {
+                                        phoneList = response.body()!!.products
+                                        binding.phoneRv.adapter = PhonesAdapter(phoneList)
+
+                                    }
+
+                                    override fun onFailure(call: Call<ProductData>, t: Throwable) {
+                                        Log.d("TAG", "$t")
+                                    }
+
+                                })
+                            } else {
+                                api.getByCategory(category).enqueue(object : Callback<ProductData> {
+                                    override fun onResponse(
+                                        call: Call<ProductData>,
+                                        response: Response<ProductData>
+                                    ) {
+                                        phoneList = response.body()!!.products
+                                        binding.phoneRv.adapter = PhonesAdapter(phoneList)
+                                    }
+
+                                    override fun onFailure(call: Call<ProductData>, t: Throwable) {
+                                        Log.d("TAG", "$t")
+                                    }
+                                })
+                            }
+                        }
+
+                    })
+            }
+
+            override fun onFailure(call: Call<List<String>>, t: Throwable) {
+
+            }
+
+        })
 
         binding.search.setOnQueryTextListener(object : OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -116,6 +171,20 @@ class HomeFragment : Fragment() {
 
         return binding.root
     }
+
+//    fun changeProductsAdapter(products: List<Product>) {
+//        binding.phoneRv.adapter =
+//            PhonesAdapter(products, object : PhonesAdapter.ProductPressed {
+//                override fun onPressed(product: Product) {
+//                    val bundle = Bundle()
+//                    bundle.putSerializable("product", product)
+//                    findNavController().navigate(
+//                        R.id.action_homeFragment_to_productFragment,
+//                        bundle
+//                    )
+//                }
+//            })
+//    }
 
     companion object {
         /**

@@ -116,16 +116,16 @@
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold" />
-                <!--                <androidx.recyclerview.widget.RecyclerView-->
-                <!--                    android:id="@+id/deals_recyclerview"-->
-                <!--                    android:layout_marginTop="15dp"-->
-                <!--                    android:layout_width="wrap_content"-->
-                <!--                    android:layout_height="wrap_content"-->
-                <!--                    app:layout_constraintTop_toBottomOf="@id/topdeals_text"-->
-                <!--                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"-->
-                <!--                    android:orientation="horizontal"-->
-                <!--                    android:layout_marginStart="15dp"-->
-                <!--                    tools:listitem="@layout/topdeals_item"/>-->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/deals_recyclerview"
+                        android:layout_marginTop="15dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toBottomOf="@id/topdeals_text"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        android:orientation="horizontal"
+                        android:layout_marginStart="15dp"
+                        tools:listitem="@layout/topdeals_item"/>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/phoneRv"

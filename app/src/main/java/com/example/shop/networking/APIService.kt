@@ -42,4 +42,12 @@ interface APIService {
 
     @DELETE("/carts/{id}")
     fun deleteCart()
+
+    @GET("/products/categories")
+    fun getCategories(): Call<List<String>>
+
+    @GET("/products/category/{category}")
+    fun getByCategory(@Path("category") category : String): Call<ProductData>
+
+
 }
