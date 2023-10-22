@@ -24,14 +24,14 @@ class MainFragment : Fragment() {
                     loadFragment(HomeFragment())
                     true
                 }
-//                R.id.menu_orders -> {
-//                    loadFragment(OrdersFragment())
-//                    true
-//                }
-//                R.id.menu_profile -> {
-//                    loadFragment(AccountFragment())
-//                    true
-//                }
+                R.id.menu_orders -> {
+                    loadFragment(CartFragment())
+                    true
+                }
+                R.id.menu_profile -> {
+                    loadFragment(ProfileFragment())
+                    true
+                }
                 else -> {
                     false
                 }

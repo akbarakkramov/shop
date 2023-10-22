@@ -22,11 +22,8 @@ interface APIService {
     @GET("/products/{id}")
     fun getProduct(@Path("id") id: Int): Call<Product>
 
-
-
-@GET("/products/search")
-fun searchByName(@Query("q") name: String): Call<ProductData>
-
+    @GET("/products/search")
+    fun searchByName(@Query("q") name: String): Call<ProductData>
 
     @POST("/auth/login")
     fun login(@Body login: Login): Call<User>
@@ -35,10 +32,10 @@ fun searchByName(@Query("q") name: String): Call<ProductData>
     fun getAllCarts(): Call<CartData>
 
     @GET("/carts/{id}")
-    fun getCart(@Path("id") id:Int): Call<Cart>
+    fun getCart(@Path("id") id: Int): Call<CartData>
 
-//    @POST("/carts/add")
-//    fun addCart(@Body userId:Int, List<Cart>)
+    @POST("/carts/add")
+    fun addCart(@Body userId:Int, list:List<Cart>)
 
     @PUT("/carts/{id}")
     fun updateCart()
@@ -50,7 +47,7 @@ fun searchByName(@Query("q") name: String): Call<ProductData>
     fun getCategories(): Call<List<String>>
 
     @GET("/products/category/{category}")
-    fun getByCategory(@Path("category") category : String): Call<ProductData>
+    fun getByCategory(@Path("category") category: String): Call<ProductData>
 
 
 }

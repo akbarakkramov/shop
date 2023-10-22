@@ -10,11 +10,10 @@ import coil.load
 import com.example.shop.R
 import com.example.shop.model.Product
 
-class PhonesAdapter(var phoneList:List<Product>) : RecyclerView.Adapter<PhonesAdapter.PhoneHolder>(){
+class PhonesAdapter(var phoneList:List<Product>, var productPressed:ProductPressed) : RecyclerView.Adapter<PhonesAdapter.PhoneHolder>(){
 
     class PhoneHolder(itemView: View):RecyclerView.ViewHolder(itemView){
         var name:TextView = itemView.findViewById(R.id.phone_name)
-        var favorite:ImageView = itemView.findViewById(R.id.yurakcha)
         var img:ImageView = itemView.findViewById(R.id.phone_img)
         var reyting:TextView = itemView.findViewById(R.id.reyting)
         var price:TextView = itemView.findViewById(R.id.phone_price)
@@ -34,14 +33,14 @@ class PhonesAdapter(var phoneList:List<Product>) : RecyclerView.Adapter<PhonesAd
         holder.reyting.text = phone.rating.toString()
         holder.price.text = phone.price.toString()
         holder.img.load(phone.thumbnail)
-//        holder.itemView.setOnClickListener {
-//            productPressed.onPressed(phone)
-//        }
+        holder.itemView.setOnClickListener {
+            productPressed.onPressed(phone)
+        }
     }
 
+    interface ProductPressed{
+        fun onPressed(product: Product)
+    }
 
-//    interface ProductPressed{
-//        fun onPressed(product: Product)
-//    }
 
 }

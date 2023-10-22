@@ -15,14 +15,6 @@
             app:cardCornerRadius="20dp"
             android:backgroundTint="#ECE9E9"
             android:elevation="20dp">
-            <ImageView
-                android:elevation="2dp"
-                android:id="@+id/yurakcha"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/baseline_favorite_border_24"
-                android:layout_gravity="end"
-                android:layout_margin="15dp"/>
 
             <ImageView
                 android:elevation="1dp"
