@@ -26,6 +26,7 @@ class DetailsFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    lateinit var binding : FragmentDetailsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +41,7 @@ class DetailsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding = FragmentDetailsBinding.inflate(inflater, container, false)
+        binding = FragmentDetailsBinding.inflate(inflater, container, false)
         var item = arguments?.getSerializable("product") as Product
 
         binding.nameDetail.text = item.title
@@ -71,6 +72,14 @@ class DetailsFragment : Fragment() {
         }
 
         binding.addToCart.setOnClickListener {
+            var bundle = Bundle()
+            bundle.putInt("quantity", binding.result.text.toString().toInt())
+            bundle.putSerializable("product", item)
+            var cart = CartFragment()
+            cart.arguments = bundle
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.main, cart)
+                .commit()
             Toast.makeText(requireContext(), "Product added to cart", Toast.LENGTH_SHORT).show()
 
         }

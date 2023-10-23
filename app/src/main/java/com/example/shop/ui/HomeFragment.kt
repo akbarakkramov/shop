@@ -11,12 +11,15 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView.OnQueryTextListener
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import coil.load
+import com.example.shop.MyShared
 import com.example.shop.R
 import com.example.shop.adapters.CategoryAdapter
 import com.example.shop.adapters.PhonesAdapter
 import com.example.shop.databinding.FragmentHomeBinding
 import com.example.shop.model.Product
 import com.example.shop.model.ProductData
+import com.example.shop.model.User
 import com.example.shop.networking.APIClient
 import com.example.shop.networking.APIService
 import retrofit2.Call
@@ -33,7 +36,7 @@ class HomeFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     lateinit var phoneList: List<Product>
-    lateinit var searchList:List<Product>
+    lateinit var searchList: List<Product>
     lateinit var binding: FragmentHomeBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,14 +47,20 @@ class HomeFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         val api = APIClient.getInstance().create(APIService::class.java)
+        val shared = MyShared.getInstance(requireContext())
+        var user: User = shared.getUser()!!
         phoneList = listOf()
         searchList = listOf()
+
+        binding.personImage.load(user.image)
+        binding.personName.text = user.firstName + " " + user.lastName
 
         var manager = GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
         binding.phoneRv.layoutManager = manager
@@ -64,18 +73,19 @@ class HomeFragment : Fragment() {
             override fun onResponse(call: Call<ProductData>, response: Response<ProductData>) {
                 if (response.isSuccessful && response.body() != null) {
                     phoneList = response.body()!!.products
-                    binding.phoneRv.adapter = PhonesAdapter(phoneList, object : PhonesAdapter.ProductPressed{
-                        override fun onPressed(product: Product) {
-                            var bundle = Bundle()
-                            var details = DetailsFragment()
-                            bundle.putSerializable("product", product)
-                            details.arguments = bundle
-                            parentFragmentManager.beginTransaction()
-                                .replace(R.id.main, details)
-                                .commit()
+                    binding.phoneRv.adapter =
+                        PhonesAdapter(phoneList, object : PhonesAdapter.ProductPressed {
+                            override fun onPressed(product: Product) {
+                                var bundle = Bundle()
+                                var details = DetailsFragment()
+                                bundle.putSerializable("product", product)
+                                details.arguments = bundle
+                                parentFragmentManager.beginTransaction()
+                                    .replace(R.id.main, details)
+                                    .commit()
 
-                        }
-                    })
+                            }
+                        })
                     Log.d("TAG1", phoneList[29].price.toString())
                 }
             }
@@ -95,24 +105,26 @@ class HomeFragment : Fragment() {
                     object : CategoryAdapter.CategoryPressed {
                         override fun onPressed(category: String) {
                             if (category == "") {
-                                api.getAllProducts().enqueue(object : Callback<ProductData>{
+                                api.getAllProducts().enqueue(object : Callback<ProductData> {
                                     override fun onResponse(
                                         call: Call<ProductData>,
                                         response: Response<ProductData>
                                     ) {
                                         phoneList = response.body()!!.products
-                                        binding.phoneRv.adapter = PhonesAdapter(phoneList, object : PhonesAdapter.ProductPressed{
-                                            override fun onPressed(product: Product) {
-                                                var bundle = Bundle()
-                                                var details = DetailsFragment()
-                                                bundle.putSerializable("product", product)
-                                                details.arguments = bundle
-                                                parentFragmentManager.beginTransaction()
-                                                    .replace(R.id.main, details)
-                                                    .commit()
+                                        binding.phoneRv.adapter = PhonesAdapter(
+                                            phoneList,
+                                            object : PhonesAdapter.ProductPressed {
+                                                override fun onPressed(product: Product) {
+                                                    var bundle = Bundle()
+                                                    var details = DetailsFragment()
+                                                    bundle.putSerializable("product", product)
+                                                    details.arguments = bundle
+                                                    parentFragmentManager.beginTransaction()
+                                                        .replace(R.id.main, details)
+                                                        .commit()
 
-                                            }
-                                        })
+                                                }
+                                            })
 
                                     }
 
@@ -128,18 +140,20 @@ class HomeFragment : Fragment() {
                                         response: Response<ProductData>
                                     ) {
                                         phoneList = response.body()!!.products
-                                        binding.phoneRv.adapter = PhonesAdapter(phoneList, object : PhonesAdapter.ProductPressed{
-                                            override fun onPressed(product: Product) {
-                                                var bundle = Bundle()
-                                                var details = DetailsFragment()
-                                                bundle.putSerializable("product", product)
-                                                details.arguments = bundle
-                                                parentFragmentManager.beginTransaction()
-                                                    .replace(R.id.main, details)
-                                                    .commit()
+                                        binding.phoneRv.adapter = PhonesAdapter(
+                                            phoneList,
+                                            object : PhonesAdapter.ProductPressed {
+                                                override fun onPressed(product: Product) {
+                                                    var bundle = Bundle()
+                                                    var details = DetailsFragment()
+                                                    bundle.putSerializable("product", product)
+                                                    details.arguments = bundle
+                                                    parentFragmentManager.beginTransaction()
+                                                        .replace(R.id.main, details)
+                                                        .commit()
 
-                                            }
-                                        })
+                                                }
+                                            })
                                     }
 
                                     override fun onFailure(call: Call<ProductData>, t: Throwable) {
@@ -157,50 +171,59 @@ class HomeFragment : Fragment() {
             }
 
         })
-        binding.search.setOnQueryTextListener(object :OnQueryTextListener {
-override fun onQueryTextSubmit(query: String?):Boolean{
-    return true
-}
-           override fun onQueryTextChange(newText:String?): Boolean {
-             if (newText != null) {
-                   api.searchByName(newText).enqueue(object : Callback<ProductData> {
-                       override fun onResponse(
-                           call: Call<ProductData>,
-                           response: Response<ProductData>) {
-                          if (response.isSuccessful && response.body() != null) {
-                              searchList= response.body()!!.products
-                              binding.topdealsText.visibility = View.INVISIBLE
+        binding.search.setOnQueryTextListener(object : OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
 
-                              var adapter1 = PhonesAdapter(searchList, object : PhonesAdapter.ProductPressed{
-                                  override fun onPressed(product: Product) {
-                                      var bundle = Bundle()
-                                      var details = DetailsFragment()
-                                      bundle.putSerializable("product", product)
-                                      details.arguments = bundle
-                                      parentFragmentManager.beginTransaction()
-                                          .replace(R.id.main, details)
-                                          .commit()
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText != null) {
+                    api.searchByName(newText).enqueue(object : Callback<ProductData> {
+                        override fun onResponse(
+                            call: Call<ProductData>,
+                            response: Response<ProductData>
+                        ) {
+                            if (response.isSuccessful && response.body() != null) {
+                                searchList = response.body()!!.products
+                                binding.topdealsText.visibility = View.INVISIBLE
 
-                                  }
-                              })
-                              var manager = GridLayoutManager(requireContext(), 2, GridLayoutManager.VERTICAL, false)
-                              binding.phoneRv.adapter = adapter1
-                              binding.phoneRv.layoutManager = manager
-                          }
-                         }
-                         override fun onFailure(call: Call<ProductData>, t: Throwable) {
+                                var adapter1 = PhonesAdapter(
+                                    searchList,
+                                    object : PhonesAdapter.ProductPressed {
+                                        override fun onPressed(product: Product) {
+                                            var bundle = Bundle()
+                                            var details = DetailsFragment()
+                                            bundle.putSerializable("product", product)
+                                            details.arguments = bundle
+                                            parentFragmentManager.beginTransaction()
+                                                .replace(R.id.main, details)
+                                                .commit()
+
+                                        }
+                                    })
+                                var manager = GridLayoutManager(
+                                    requireContext(),
+                                    2,
+                                    GridLayoutManager.VERTICAL,
+                                    false
+                                )
+                                binding.phoneRv.adapter = adapter1
+                                binding.phoneRv.layoutManager = manager
+                            }
+                        }
+
+                        override fun onFailure(call: Call<ProductData>, t: Throwable) {
                             Log.d("TAG", "OnFailure: $t")
-                         }
-                      })
-                     return true
-                 }
-                 return false
-             }
-         })
+                        }
+                    })
+                    return true
+                }
+                return false
+            }
+        })
 
         return binding.root
     }
-
 
 
     companion object {

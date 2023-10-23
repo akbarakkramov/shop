@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.shop.databinding.ActivityMainBinding
 import com.example.shop.ui.MainFragment
+import com.example.shop.ui.SplashFragment
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
@@ -13,7 +14,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         supportFragmentManager.beginTransaction()
-            .add(R.id.main, MainFragment())
+            .add(R.id.main, SplashFragment())
             .commit()
     }
 }
