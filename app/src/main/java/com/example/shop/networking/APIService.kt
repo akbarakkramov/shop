@@ -28,20 +28,11 @@ interface APIService {
     @POST("/auth/login")
     fun login(@Body login: Login): Call<User>
 
-    @GET("/carts")
-    fun getAllCarts(): Call<CartData>
-
-    @GET("/carts/{id}")
+    @GET("/carts/user/{id}")
     fun getCart(@Path("id") id: Int): Call<CartData>
 
-    @POST("/carts/add")
-    fun addCart(@Body userId:Int, list:List<Cart>)
-
     @PUT("/carts/{id}")
-    fun updateCart()
-
-    @DELETE("/carts/{id}")
-    fun deleteCart()
+    fun updateCart(products: List<Product>)
 
     @GET("/products/categories")
     fun getCategories(): Call<List<String>>

@@ -66,12 +66,13 @@ class DetailsFragment : Fragment() {
 
         binding.back.setOnClickListener {
             parentFragmentManager.beginTransaction()
-                .replace(R.id.main, HomeFragment())
+                .replace(R.id.main, MainFragment())
                 .commit()
         }
 
         binding.addToCart.setOnClickListener {
             Toast.makeText(requireContext(), "Product added to cart", Toast.LENGTH_SHORT).show()
+
         }
 
         return binding.root

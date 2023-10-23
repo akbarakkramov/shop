@@ -1,6 +1,7 @@
 package com.example.shop.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -9,8 +10,13 @@ import com.example.shop.R
 import com.example.shop.adapters.CartAdapter
 import com.example.shop.databinding.FragmentCartBinding
 import com.example.shop.model.Cart
+import com.example.shop.model.CartData
+import com.example.shop.model.Login
 import com.example.shop.networking.APIClient
 import com.example.shop.networking.APIService
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -43,6 +49,22 @@ class CartFragment : Fragment() {
         val binding = FragmentCartBinding.inflate(inflater, container, false)
         val api = APIClient.getInstance().create(APIService::class.java)
         cartList = listOf()
+
+        var l = 15
+
+        api.getCart(l).enqueue(object : Callback<CartData>{
+            override fun onResponse(call: Call<CartData>, response: Response<CartData>) {
+                if (response.isSuccessful && response.body() != null){
+                    cartList = response.body()!!.carts
+                }
+            }
+
+            override fun onFailure(call: Call<CartData>, t: Throwable) {
+                Log.d("TAG", "onFailure: $t")
+            }
+        })
+
+
 
         var adapter = CartAdapter(cartList)
         binding.cartRv.adapter = adapter
